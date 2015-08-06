@@ -6,5 +6,6 @@ import android.view.ViewParent;
  * Created by cyjss on 2015/8/6.
  */
 public interface CYViewParent {
-    public void setMyText(Object obj);
+    public void setCustomData(Object obj);
+    public Object getCustomData();
 }

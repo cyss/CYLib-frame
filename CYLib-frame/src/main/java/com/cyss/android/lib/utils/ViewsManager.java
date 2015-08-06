@@ -29,6 +29,8 @@ public class ViewsManager {
     private Context context;
     private Map<String, Integer> layouts = new HashMap<String, Integer>();
     private Map<String, Integer> ids = new HashMap<String, Integer>();
+    private Map<Integer, String> layoutsReverse = new HashMap<Integer, String>();
+    private Map<Integer, String> idsReverse = new HashMap<Integer, String>();
 
     private final String LAYOUT_NAME = "layout";
     private final String ID_NAME = "id";
@@ -48,17 +50,20 @@ public class ViewsManager {
     }
 
     private void refreshViews() {
-        Boolean layoutFlag = this.injectFields(layouts, context.getPackageName() + ".R$" + LAYOUT_NAME);
-        Boolean idsFlag = this.injectFields(ids, context.getPackageName() + ".R$" + ID_NAME);
+        Boolean layoutFlag = this.injectFields(layouts, layoutsReverse, context.getPackageName() + ".R$" + LAYOUT_NAME);
+        Boolean idsFlag = this.injectFields(ids, idsReverse, context.getPackageName() + ".R$" + ID_NAME);
     }
 
-    private Boolean injectFields(Map<String, Integer> map, String clazzName) {
+    private Boolean injectFields(Map<String, Integer> map, Map<Integer, String> mapReverse, String clazzName) {
         Boolean flag = true;
         try {
             Class clazz = Class.forName(clazzName);
             Field[] fields = clazz.getDeclaredFields();
             for (Field field : fields) {
-                map.put(field.getName(), field.getInt(null));
+                String name = field.getName();
+                Integer id = field.getInt(null);
+                map.put(name, id);
+                mapReverse.put(id, name);
             }
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
@@ -71,6 +76,10 @@ public class ViewsManager {
 
     public Integer findIdByName(String name) {
         return ids.get(name);
+    }
+
+    public String findNameById(Integer id) {
+        return idsReverse.get(id);
     }
 
     public Integer findLayoutByName(String name) {
@@ -133,9 +142,25 @@ public class ViewsManager {
                     }
                 }
             } else if (v instanceof CYViewParent) {
-                ((CYViewParent) v).setMyText(obj);
+                ((CYViewParent) v).setCustomData(obj);
             }
         }
+    }
+
+    public static Object getViewData(View v) {
+        Object obj = null;
+        if (v != null) {
+            if (v instanceof TextView) {
+                obj = ((TextView) v).getText();
+            } else if (v instanceof Button) {
+                obj = ((Button) v).getTag();
+            } else if (v instanceof EditText) {
+                obj = ((EditText) v).getText();
+            } else if (v instanceof CYViewParent) {
+                obj = ((CYViewParent) v).getCustomData();
+            }
+        }
+        return obj;
     }
 
     private static View findViewById(Object obj, int id) {
