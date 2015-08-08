@@ -193,14 +193,15 @@ public abstract class CYActivity extends Activity implements View.OnClickListene
                     View v = findViewById(id);
                     Object val = ViewsManager.getInstance(this).getViewData(v);
                     if (val != null) {
+                        Method method = null;
                         try {
-                            Method method = clazz.getMethod(methodName);
-                            method.invoke(obj, val);
+                            method = clazz.getMethod(methodName, field.getType());
+                            ViewsManager.invokeSetMethod(obj, method, val);
                         } catch (NoSuchMethodException e) {
                             e.printStackTrace();
                         } catch (InvocationTargetException e) {
                             e.printStackTrace();
-                        } catch (IllegalAccessException e) {
+                        } catch (NumberFormatException e) {
                             e.printStackTrace();
                         }
                     }

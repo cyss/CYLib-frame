@@ -1,10 +1,12 @@
 package test.frame.cyss.com.testdemo;
 
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,8 +22,8 @@ import java.util.Map;
 
 public class MainActivity extends CYActivity {
 
-    //    @BindView(id = R.id.hw, click = true)
-    private TextView tv;
+    @BindView(id = R.id.btn, click = true)
+    private TextView btn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,19 +34,16 @@ public class MainActivity extends CYActivity {
         map.put("et", "test fill data212");
         fillMapData(map);
         fillBeanData(new Person());
-        List list = getAllHasIdViews(getWindow().getDecorView());
-        CYLog.d(this, list.size() + "===<");
         map = getMapData();
         for (String key : map.keySet()) {
             CYLog.d(this, key + "===" + map.get(key));
         }
+        ListView lv = null;
     }
 
     @Override
     public void viewClick(View v) {
-        GsonBuilder builder = new GsonBuilder();
-        Gson gson = builder.create();
-        Toast.makeText(this, gson.toJson(getBeanData(Person.class)), Toast.LENGTH_LONG).show();
+        startActivity(new Intent(this, ListViewActivity.class));
     }
 
     //内部类需要加上public static(getBeanData使用提示)
@@ -52,6 +51,11 @@ public class MainActivity extends CYActivity {
         private String name = "cyss";
         private Integer age = 21;
         private Boolean isGirl = false;
+
+        @Override
+        public String toString() {
+            return new StringBuffer(name).append(",").append(age).append(",").append(isGirl).toString();
+        }
 
         public String getName() {
             return name;

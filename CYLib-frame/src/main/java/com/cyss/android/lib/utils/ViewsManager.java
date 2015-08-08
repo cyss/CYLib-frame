@@ -14,6 +14,8 @@ import com.cyss.android.lib.annotation.BindView;
 import com.cyss.android.lib.impl.CYViewParent;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -161,6 +163,28 @@ public class ViewsManager {
             }
         }
         return obj;
+    }
+
+    public static void invokeSetMethod(Object obj, Method method, Object val) throws InvocationTargetException, IllegalAccessException, NumberFormatException {
+        Class[] parameterTypes = method.getParameterTypes();
+        if (parameterTypes.length == 1) {
+            Class c = parameterTypes[0];
+            if (c.equals(Integer.class)) {
+                method.invoke(obj, Integer.parseInt(val.toString()));
+            } else if (c.equals(String.class)) {
+                method.invoke(obj, val.toString());
+            } else if (c.equals(Boolean.class)) {
+                method.invoke(obj, Boolean.parseBoolean(val.toString()));
+            } else if (c.equals(Long.class)) {
+                method.invoke(obj, Long.parseLong(val.toString()));
+            } else if (c.equals(Float.class)) {
+                method.invoke(obj, Float.parseFloat(val.toString()));
+            } else if (c.equals(Double.class)) {
+                method.invoke(obj, Double.parseDouble(val.toString()));
+            } else {
+                method.invoke(obj, val);
+            }
+        }
     }
 
     private static View findViewById(Object obj, int id) {
