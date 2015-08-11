@@ -16,6 +16,8 @@ import com.cyss.android.lib.CYListView;
 import com.cyss.android.lib.annotation.BindView;
 import com.cyss.android.lib.utils.CYLog;
 
+import java.util.Random;
+
 /**
  * Created by cyjss on 2015/8/7.
  */
@@ -25,6 +27,7 @@ public class ListViewActivity extends CYActivity {
     private CYListView listView;
     @BindView(id = R.id.btn, click = true)
     private Button btn;
+    private int count = 10;
 
     private boolean headerEnable = true;
     private ListViewAdapter adapter = new ListViewAdapter();
@@ -36,6 +39,7 @@ public class ListViewActivity extends CYActivity {
                 listView.endRefresh();
             } else {
                 listView.endLoadMore();
+                adapter.notifyDataSetChanged();
             }
         }
     };
@@ -48,8 +52,7 @@ public class ListViewActivity extends CYActivity {
         listView.setOnCYListRefreshListener(new CYListView.onCYListViewRefreshListener() {
             @Override
             public void onRefresh() {
-                CYLog.d(this, "==->");
-//                listView.endRefresh();
+                CYLog.d(this, "==-> refresh");
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -74,25 +77,31 @@ public class ListViewActivity extends CYActivity {
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
+                        count += new Random().nextInt(10);
                         handler.sendEmptyMessage(1);
                     }
                 }).start();
             }
         });
+//        listView.endNoMoreData();
     }
 
     @Override
     public void viewClick(View v) {
-        CYLog.d(this, "====>" + listView.getLastVisiblePosition());
         headerEnable = !headerEnable;
-        listView.setHeaderEnable(headerEnable);
+        listView.setFooterEnable(headerEnable);
+//        CYLog.d(this, "====>" + listView.getLastVisiblePosition());
+//        headerEnable = !headerEnable;
+//        listView.setHeaderEnable(headerEnable);
+//
+//        listView.resetFooter();
     }
 
     private class ListViewAdapter extends BaseAdapter {
 
         @Override
         public int getCount() {
-            return 100;
+            return count;
         }
 
         @Override

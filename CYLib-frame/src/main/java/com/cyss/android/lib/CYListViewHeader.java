@@ -37,8 +37,5 @@ public class CYListViewHeader extends RelativeLayout {
     }
 
     private void defaultLayout(Context context) {
-//        this.title = new TextView(context);
-//        this.arrow = new ImageView(context);
-//        this.spinner = new Spinner(context);
     }
 }

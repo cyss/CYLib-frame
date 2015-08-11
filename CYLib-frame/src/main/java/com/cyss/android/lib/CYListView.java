@@ -1,18 +1,12 @@
 package com.cyss.android.lib;
 
-import android.animation.TypeEvaluator;
-import android.animation.ValueAnimator;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.drawable.BitmapDrawable;
-import android.media.Image;
 import android.os.Build;
-import android.os.Handler;
-import android.os.Message;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -20,16 +14,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.animation.Animation;
-import android.view.animation.OvershootInterpolator;
 import android.view.animation.RotateAnimation;
-import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Scroller;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.cyss.android.lib.utils.CYLog;
@@ -37,12 +29,13 @@ import com.cyss.android.lib.utils.CYLog;
 import java.util.zip.Inflater;
 
 /**
+ * 支持上拉刷新和加载更多的ListView
+ * To do: 支持自定义header和footer,整理代码
  * Created by cyjss on 2015/8/6.
  */
 public class CYListView extends ListView {
 
-    private Boolean isRefreshEnable = true;
-
+    //关于上拉刷新头
     private LinearLayout headerContainer;
     private RelativeLayout headerView;
     private TextView headerTitle;
@@ -58,13 +51,17 @@ public class CYListView extends ListView {
     private boolean headerEnable = true;
     private CYListViewState headerState = CYListViewState.PULL_TO_REFRESH;
 
+    //关于加载更多的Footer
     private LinearLayout footerContainer;
     private RelativeLayout footerView;
     private TextView footerTitle;
+    private ProgressBar footerSpinner;
     private int footerHeight = 0;
     private boolean footerEnable = true;
-    private CYListViewState footerState = CYListViewState.DRAG_TO_LOAD_MORE;
+    private CYListViewState footerState = CYListViewState.CLICK_TO_LOAD_MORE;
+    private int footerIdleDis = 30;
 
+    //计算存储参数
     private float downY = 0;
     private float scrollHeaderHeight = 0;
     private float scrollFooterHeight = 0;
@@ -73,8 +70,9 @@ public class CYListView extends ListView {
     private Scroller headerScroller;
     private Scroller footerScroller;
 
+    private float prevY = -1;
+    private boolean isBounce = false;
     private onCYListViewRefreshListener refreshListener;
-
     private onCYListViewLoadMoreListener loadMoreListener;
 
 
@@ -84,10 +82,10 @@ public class CYListView extends ListView {
         REFRESHING,
         REFRESH_FINISH,
 
-        DRAG_TO_LOAD_MORE,
-        RELEASE_TO_LOAD_MORE,
+        CLICK_TO_LOAD_MORE,
         LOADING_MORE,
-        LOAD_FINISH
+        LOAD_FINISH,
+        LOAD_NO_MORE
     }
 
     public CYListView(Context context) {
@@ -111,10 +109,18 @@ public class CYListView extends ListView {
         this.init(context);
     }
 
+    /**
+     * 停止上拉刷新
+     */
     public void endRefresh() {
         this.endRefresh(280);
     }
 
+    /**
+     * 停止上拉刷新
+     *
+     * @param stayTime 停止在提示刷新成功提示的时间
+     */
     public void endRefresh(long stayTime) {
         if (headerState == CYListViewState.REFRESH_FINISH) {
             return;
@@ -129,25 +135,67 @@ public class CYListView extends ListView {
         showHeaderSuccess();
     }
 
+    /**
+     * 设置上拉刷新是否可用
+     *
+     * @param flag
+     */
     public void setHeaderEnable(boolean flag) {
         this.headerEnable = flag;
         setHeaderMarginTop(-headerHeight);
         setHeaderContent(CYListViewState.PULL_TO_REFRESH);
     }
 
+    /**
+     * 设置上拉刷新后的事件
+     *
+     * @param refreshListener
+     */
     public void setOnCYListRefreshListener(onCYListViewRefreshListener refreshListener) {
         this.refreshListener = refreshListener;
     }
 
+    /**
+     * 停止加载更多
+     */
     public void endLoadMore() {
-        setFooterContent(CYListViewState.LOAD_FINISH);
+        setFooterContent(CYListViewState.CLICK_TO_LOAD_MORE);
         bounceBackFooter();
     }
 
-    public void setFooterEnable(boolean flag) {
-        this.footerEnable = flag;
+    /**
+     * 设置没有更多内容
+     */
+    public void endNoMoreData() {
+        setFooterContent(CYListViewState.LOAD_NO_MORE);
+        bounceBackFooter();
     }
 
+    /**
+     * 重置加载更多的Footer
+     */
+    public void resetFooter() {
+        this.footerEnable = true;
+        setFooterMarginBottom(-footerHeight);
+        setFooterContent(CYListViewState.CLICK_TO_LOAD_MORE);
+    }
+
+    /**
+     * 设置是否可以加载更多
+     *
+     * @param flag
+     */
+    public void setFooterEnable(boolean flag) {
+        this.footerEnable = flag;
+        setFooterMarginBottom(flag ? 0 : -footerHeight);
+        setFooterContent(CYListViewState.CLICK_TO_LOAD_MORE);
+    }
+
+    /**
+     * 加载更多的事件监听
+     *
+     * @param loadMoreListener
+     */
     public void setOnCYListLoadMoreListener(onCYListViewLoadMoreListener loadMoreListener) {
         this.loadMoreListener = loadMoreListener;
     }
@@ -168,6 +216,15 @@ public class CYListView extends ListView {
         footerContainer = (LinearLayout) LayoutInflater.from(context).inflate(R.layout.cy_listview_header, null);
         footerView = (RelativeLayout) footerContainer.findViewById(R.id.cy_listview_header);
         footerTitle = (TextView) footerView.findViewById(R.id.cy_listview_header_title);
+        footerSpinner = (ProgressBar) footerView.findViewById(R.id.cy_listview_header_spinner);
+        footerContainer.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (footerState == CYListViewState.CLICK_TO_LOAD_MORE) {
+                    setFooterContent(CYListViewState.LOADING_MORE);
+                }
+            }
+        });
         addFooterView(footerContainer);
 
         headerScroller = new Scroller(context);
@@ -192,7 +249,23 @@ public class CYListView extends ListView {
         footerContainer.measure(w, h);
         int height = footerContainer.getMeasuredHeight();
         footerHeight = height;
-        setFooterMarginBottom(-footerHeight);
+        footerIdleDis = footerHeight / 2;
+        footerContainer.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                if (getFirstVisiblePosition() == 0 && getLastVisiblePosition() == getAdapter().getCount() - 1) {
+                    setFooterMarginBottom(0);
+                } else {
+                    setFooterMarginBottom(-footerHeight);
+                }
+                getViewTreeObserver().removeGlobalOnLayoutListener(this);
+            }
+        });
+    }
+
+    @Override
+    public void setAdapter(ListAdapter adapter) {
+        super.setAdapter(adapter);
     }
 
     private void setHeaderMarginTop(int top) {
@@ -211,9 +284,6 @@ public class CYListView extends ListView {
 
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
-        if (!isRefreshEnable) {
-            return true;
-        }
         switch (ev.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 downY = ev.getY();
@@ -241,30 +311,16 @@ public class CYListView extends ListView {
                         this.refreshListener.onRefresh();
                     }
                 }
-                if ((getLastVisiblePosition() == getAdapter().getCount() - 1 || footerState == CYListViewState.RELEASE_TO_LOAD_MORE) && footerEnable) {
-                    if (footerState != CYListViewState.LOADING_MORE) {
-                        if (marginBottom >= 0) {
-                            setFooterContent(CYListViewState.LOADING_MORE);
-                        } else {
-                            setFooterContent(CYListViewState.DRAG_TO_LOAD_MORE);
-                        }
-                    }
-                    if (marginBottom < -footerHeight) {
-                        setHeaderMarginTop(-footerHeight);
-                        if (footerState == CYListViewState.LOADING_MORE) {
-                            this.bounceBackFooter();
-                        }
-                    } else {
-                        this.bounceBackFooter();
-                    }
-                    if (footerState == CYListViewState.LOADING_MORE && this.loadMoreListener != null) {
-                        this.loadMoreListener.onLoadMore();
-                    }
+                if ((getLastVisiblePosition() >= getAdapter().getCount() - 2) && footerEnable) {
+                    bounceBackFooter();
                 }
                 break;
             case MotionEvent.ACTION_MOVE:
-                if (getFirstVisiblePosition() == 0 && headerEnable) {
-                    float y = ev.getY();
+                float y = ev.getY();
+                if (isBounce) {
+                    downY = y;
+                }
+                if (getFirstVisiblePosition() == 0 && headerEnable && !isBounce) {
                     float gap = y - downY + scrollHeaderHeight;
                     int t = Math.round(gap);
                     setHeaderMarginTop(t);
@@ -276,19 +332,18 @@ public class CYListView extends ListView {
                         }
                     }
                 }
-                if (getLastVisiblePosition() == getAdapter().getCount() - 1 && footerEnable) {
-                    float y = ev.getY();
+                if (getLastVisiblePosition() == getAdapter().getCount() - 1 && footerEnable && !isBounce) {
                     float gap = downY - y + scrollFooterHeight;
+                    if (getFirstVisiblePosition() == 0) {
+                        gap += headerHeight + marginTop;
+                    }
                     int t = Math.round(gap);
                     setFooterMarginBottom(t);
-                    if (footerState != CYListViewState.LOADING_MORE) {
-                        if (t >= 0) {
-                            setFooterContent(CYListViewState.RELEASE_TO_LOAD_MORE);
-                        } else if (t < 0) {
-                            setFooterContent(CYListViewState.DRAG_TO_LOAD_MORE);
-                        }
+                    if (footerHeight + t > footerIdleDis && y - downY < -footerIdleDis && footerState != CYListViewState.LOAD_NO_MORE && footerState != CYListViewState.LOADING_MORE) {
+                        setFooterContent(CYListViewState.LOADING_MORE);
                     }
                 }
+                prevY = y;
                 break;
         }
         return super.onTouchEvent(ev);
@@ -330,14 +385,20 @@ public class CYListView extends ListView {
         if (state == footerState) {
             return;
         }
-        if (state == CYListViewState.DRAG_TO_LOAD_MORE) {
-            footerTitle.setText("上拽加载更多");
-        } else if (state == CYListViewState.RELEASE_TO_LOAD_MORE) {
-            footerTitle.setText("放手加载更多");
+        if (state == CYListViewState.CLICK_TO_LOAD_MORE) {
+            footerSpinner.setVisibility(View.GONE);
+            footerTitle.setText("点击加载更多");
         } else if (state == CYListViewState.LOADING_MORE) {
+            footerSpinner.setVisibility(View.VISIBLE);
             footerTitle.setText("正在加载数据");
+            if (this.loadMoreListener != null) {
+                this.loadMoreListener.onLoadMore();
+            }
         } else if (state == CYListViewState.LOAD_FINISH) {
-            footerTitle.setText("成功加载数据");
+            setFooterContent(CYListViewState.CLICK_TO_LOAD_MORE);
+        } else if (state == CYListViewState.LOAD_NO_MORE) {
+            footerSpinner.setVisibility(View.GONE);
+            footerTitle.setText("没有更多数据");
         }
         footerState = state;
     }
@@ -351,34 +412,34 @@ public class CYListView extends ListView {
                     : headerScroller.getFinalY() - headerScroller.getCurrY() - headerHeight;
             setHeaderMarginTop(gap);
             if (headerScroller.isFinished() && headerScroller.getFinalY() == headerScroller.getCurrY()) {
+                isBounce = false;
                 if (headerState == CYListViewState.REFRESH_FINISH) {
                     setHeaderContent(CYListViewState.PULL_TO_REFRESH);
                 } else if (headerState == CYListViewState.REFRESHING) {
-                    setSelection(0);
+                    if (getLastVisiblePosition() != getAdapter().getCount() - 1) {
+                        setSelection(0);
+                    }
                 }
             }
         }
         if (footerScroller.computeScrollOffset()) {
-            int gap = footerState == CYListViewState.LOADING_MORE
-                    ? footerScroller.getFinalY() - footerScroller.getCurrY()
-                    : footerScroller.getFinalY() - footerScroller.getCurrY() - footerHeight;
+            int gap = footerScroller.getFinalY() - footerScroller.getCurrY();
             setFooterMarginBottom(gap);
             if (footerScroller.isFinished() && footerScroller.getFinalY() == footerScroller.getCurrY()) {
-                if (footerState == CYListViewState.LOAD_FINISH) {
-                    setFooterContent(CYListViewState.DRAG_TO_LOAD_MORE);
-                }
+                isBounce = false;
             }
         }
     }
 
     private void bounceBackHeader() {
+        isBounce = true;
         int dy = headerState == CYListViewState.REFRESHING ? 0 : -headerHeight;
         headerScroller.startScroll(0, 0, 0, (int) marginTop - dy, 600);
     }
 
     private void bounceBackFooter() {
-        int dy = footerState == CYListViewState.LOADING_MORE ? 0 : -footerHeight;
-        footerScroller.startScroll(0, 0, 0, (int) marginBottom - dy, 600);
+        isBounce = true;
+        footerScroller.startScroll(0, 0, 0, (int) marginBottom, 600);
     }
 
     public interface onCYListViewRefreshListener {
@@ -395,7 +456,6 @@ public class CYListView extends ListView {
         paint.setStrokeWidth(1.5f);
         Bitmap arrow = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_4444);
         arrow.prepareToDraw();
-        final float marginTop = 4;
         Canvas canvas = new Canvas();
         canvas.setBitmap(arrow);
         canvas.drawLine(w / 2, h, 0, h / 2, paint);

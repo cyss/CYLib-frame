@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -23,7 +24,9 @@ import java.util.Map;
 public class MainActivity extends CYActivity {
 
     @BindView(id = R.id.btn, click = true)
-    private TextView btn;
+    private Button btn;
+    @BindView(id = R.id.hw)
+    private TextView hw;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,17 +47,21 @@ public class MainActivity extends CYActivity {
     @Override
     public void viewClick(View v) {
         startActivity(new Intent(this, ListViewActivity.class));
+//        hw.setText(getBeanData(Person.class).toString());
     }
+
 
     //内部类需要加上public static(getBeanData使用提示)
     public static class Person {
         private String name = "cyss";
         private Integer age = 21;
         private Boolean isGirl = false;
+        private String comment = "备注";
 
         @Override
         public String toString() {
-            return new StringBuffer(name).append(",").append(age).append(",").append(isGirl).toString();
+
+            return new StringBuffer(name).append(",").append(age).append(",").append(isGirl).append(",").append(comment).toString();
         }
 
         public String getName() {
@@ -79,6 +86,15 @@ public class MainActivity extends CYActivity {
 
         public void setIsGirl(Boolean isGirl) {
             this.isGirl = isGirl;
+        }
+
+
+        public String getComment() {
+            return getIsGirl() ? "女" : "男" + comment;
+        }
+
+        public void setComment(String comment) {
+            this.comment = comment;
         }
     }
 }
