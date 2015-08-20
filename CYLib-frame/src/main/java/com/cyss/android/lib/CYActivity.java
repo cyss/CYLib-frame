@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.cyss.android.lib.annotation.BindView;
 import com.cyss.android.lib.impl.CYAutoData;
 import com.cyss.android.lib.impl.CYViewParent;
+import com.cyss.android.lib.utils.ActivityUtils;
 import com.cyss.android.lib.utils.CYLog;
 import com.cyss.android.lib.utils.ViewsManager;
 
@@ -84,40 +85,11 @@ public abstract class CYActivity extends Activity implements View.OnClickListene
     }
 
     public void fillMapData(Map<String, Object> params) {
-        for (String key : params.keySet()) {
-            Integer id = ViewsManager.getInstance(this).findIdByName(key.toString());
-            if (id != null) {
-                View v = findViewById(id);
-                ViewsManager.fillViewData(v, params.get(key));
-            }
-        }
+        ActivityUtils.fillMapData(params, this);
     }
 
     public void fillBeanData(Object obj) {
-        Class clazz = obj.getClass();
-        Field[] fields = clazz.getDeclaredFields();
-        for (Field field : fields) {
-            String fieldName = field.getName();
-            String methodName = "";
-            if (!Character.isUpperCase(fieldName.charAt(0))) {
-                methodName = fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
-            }
-            methodName = "get" + methodName;
-            try {
-                Method method = clazz.getMethod(methodName);
-                Integer id = ViewsManager.getInstance(this).findIdByName(fieldName);
-                if (id != null) {
-                    View v = findViewById(id);
-                    ViewsManager.fillViewData(v, method.invoke(obj));
-                }
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        }
+        ActivityUtils.fillBeanData(obj, this);
     }
 
     /**
@@ -130,88 +102,15 @@ public abstract class CYActivity extends Activity implements View.OnClickListene
     }
 
     public Map<String, Object> getMapData(View parentView) {
-        Map<String, Object> map = new HashMap<String, Object>();
-        List<View> list = getAllHasIdViews(parentView);
-        for (View v : list) {
-            Object val = ViewsManager.getInstance(this).getViewData(v);
-            String name = ViewsManager.getInstance(this).findNameById(v.getId());
-            if (name != null) {
-                map.put(name, val);
-            }
-        }
-        return map;
+        return ActivityUtils.getMapData(parentView, this);
     }
 
     public Map<String, Object> getMapFieldData() {
-        Map<String, Object> map = new HashMap<String, Object>();
-        for (Integer key : needViews.keySet()) {
-            View v = needViews.get(key);
-            Object val = ViewsManager.getInstance(this).getViewData(v);
-            String name = ViewsManager.getInstance(this).findNameById(key);
-            if (name != null) {
-                map.put(name, val);
-            }
-        }
-        return map;
+        return ActivityUtils.getMapFieldData(needViews, this);
     }
 
-    /**
-     * 获取所有子View
-     *
-     * @param view
-     * @return
-     */
-    protected List<View> getAllHasIdViews(View view) {
-        List<View> allChildren = new ArrayList<View>();
-        if (view instanceof ViewGroup) {
-            ViewGroup vp = (ViewGroup) view;
-            for (int i = 0; i < vp.getChildCount(); i++) {
-                View viewChild = vp.getChildAt(i);
-                if (viewChild.getId() != -1) {
-                    allChildren.add(viewChild);
-                }
-                allChildren.addAll(getAllHasIdViews(viewChild));
-            }
-        }
-        return allChildren;
-    }
 
     public Object getBeanData(Class clazz) {
-        Field[] fields = clazz.getDeclaredFields();
-        Object obj = null;
-        try {
-            obj = clazz.newInstance();
-            for (Field field : fields) {
-                String fieldName = field.getName();
-                String methodName = "";
-                if (!Character.isUpperCase(fieldName.charAt(0))) {
-                    methodName = fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
-                }
-                methodName = "set" + methodName;
-                Integer id = ViewsManager.getInstance(this).findIdByName(fieldName);
-                if (id != null) {
-                    View v = findViewById(id);
-                    Object val = ViewsManager.getInstance(this).getViewData(v);
-                    if (val != null) {
-                        Method method = null;
-                        try {
-                            method = clazz.getMethod(methodName, field.getType());
-                            ViewsManager.invokeSetMethod(obj, method, val);
-                        } catch (NoSuchMethodException e) {
-                            e.printStackTrace();
-                        } catch (InvocationTargetException e) {
-                            e.printStackTrace();
-                        } catch (NumberFormatException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            }
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        return obj;
+        return ActivityUtils.getBeanData(clazz, this);
     }
 }

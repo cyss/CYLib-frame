@@ -4,19 +4,23 @@ import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.cyss.android.lib.CYActivity;
+import com.cyss.android.lib.CYFragmentActivity;
 import com.cyss.android.lib.annotation.BindView;
 import com.cyss.android.lib.impl.CYViewParent;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -128,7 +132,9 @@ public class ViewsManager {
 
     public static void fillViewData(View v, Object obj) {
         if (v != null) {
-            if (v instanceof TextView) {
+            if (v instanceof CYViewParent) {
+                ((CYViewParent) v).setCustomData(obj);
+            } else if (v instanceof TextView) {
                 ((TextView) v).setText(obj.toString());
             } else if (v instanceof Button) {
                 ((Button) v).setText(obj.toString());
@@ -143,8 +149,6 @@ public class ViewsManager {
                     } catch (NumberFormatException e) {
                     }
                 }
-            } else if (v instanceof CYViewParent) {
-                ((CYViewParent) v).setCustomData(obj);
             }
         }
     }
@@ -187,9 +191,36 @@ public class ViewsManager {
         }
     }
 
-    private static View findViewById(Object obj, int id) {
+    /**
+     * 获取所有子View
+     *
+     * @param view
+     * @return
+     */
+    public static List<View> getAllHasIdViews(View view) {
+        List<View> allChildren = new ArrayList<View>();
+        if (view instanceof ViewGroup) {
+            ViewGroup vp = (ViewGroup) view;
+            for (int i = 0; i < vp.getChildCount(); i++) {
+                View viewChild = vp.getChildAt(i);
+                if (viewChild.getId() != -1) {
+                    allChildren.add(viewChild);
+                }
+                allChildren.addAll(getAllHasIdViews(viewChild));
+            }
+        }
+        return allChildren;
+    }
+
+    public static View findViewById(Object obj, int id) {
         if (obj instanceof CYActivity) {
             return ((CYActivity) obj).findViewById(id);
+        } else if (obj instanceof CYFragmentActivity) {
+            return ((CYFragmentActivity) obj).findViewById(id);
+        } else if (obj instanceof View) {
+            return ((View) obj).findViewById(id);
+        } else if (obj instanceof Activity) {
+            return ((Activity) obj).findViewById(id);
         }
         return null;
     }

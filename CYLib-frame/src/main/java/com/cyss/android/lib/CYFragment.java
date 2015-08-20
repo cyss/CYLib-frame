@@ -2,7 +2,6 @@ package com.cyss.android.lib;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -18,7 +17,7 @@ public class CYFragment extends Fragment {
         HideOrShow
     }
 
-    private StoreState state;
+    private StoreState state = StoreState.HideOrShow;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -27,12 +26,15 @@ public class CYFragment extends Fragment {
 
     @Override
     public void onInflate(Activity activity, AttributeSet attrs, Bundle savedInstanceState) {
-
     }
 
     protected void viewOnResume() { }
 
     protected void viewOnPause() { }
+
+    public StoreState getState() {
+        return this.state;
+    }
 
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
