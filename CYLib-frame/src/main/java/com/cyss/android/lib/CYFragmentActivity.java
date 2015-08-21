@@ -1,6 +1,8 @@
 package com.cyss.android.lib;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -26,6 +28,9 @@ public abstract class CYFragmentActivity extends FragmentActivity implements Vie
     private Map<Integer, Map<String, CYFragment>> fragments = new HashMap<Integer, Map<String, CYFragment>>();
     private Map<Integer, ArrayList<String>> tags = new HashMap<Integer, ArrayList<String>>();
     private final String TAG_NAME = "tags";
+    private CYFragment shownFragment = null;
+
+    private FragmentManager manager = getSupportFragmentManager();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,21 +103,45 @@ public abstract class CYFragmentActivity extends FragmentActivity implements Vie
     }
 
     public void addFragmentToContainer(CYFragment fragment, Integer containerId, String tag) {
-        FragmentManager manager = getSupportFragmentManager();
-        FragmentTransaction transaction = manager.beginTransaction();
-        fragments.get(containerId).put(tag, fragment);
+        Map<String, CYFragment> map = fragments.get(containerId);
+        if (map == null) {
+            map = new HashMap<String, CYFragment>();
+            fragments.put(containerId, map);
+        }
+        map.put(tag, fragment);
         this.addTags(containerId, tag);
         showFragment(fragment, containerId, tag);
     }
 
-    public Boolean showFragment(Integer containerId, String tag) {
+    public Boolean showFragment(final Integer containerId, final String tag) {
         Boolean flag = true;
-        CYFragment fragment = null;
-        if ((fragment = getFragment(containerId, tag)) != null) {
-            this.showFragment(fragment, containerId, tag);
+        final CYFragment fragment = getFragment(containerId, tag);
+        if (fragment != null) {
+            if (!fragment.isAdded()) {
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        showFragment(fragment, containerId, tag);
+                    }
+                }, 100);
+            } else {
+                this.showFragment(fragment, containerId, tag);
+            }
         } else {
             CYLog.d(this, "no found tag named:" + tag);
             flag = false;
+        }
+        return flag;
+    }
+
+    public Boolean showFragment(CYFragment fragment, Integer containerId) {
+        Boolean flag = false;
+        FragmentTransaction transaction = manager.beginTransaction();
+        hideAllFragment(transaction, containerId);
+        if (fragment.isAdded()) {
+            transaction.show(fragment);
+            flag = true;
         }
         return flag;
     }
@@ -129,19 +158,34 @@ public abstract class CYFragmentActivity extends FragmentActivity implements Vie
     }
 
     private void showFragment(CYFragment fragment, Integer containerId, String tag) {
-        FragmentManager manager = getSupportFragmentManager();
+
         FragmentTransaction transaction = manager.beginTransaction();
-        hideAllFragment(transaction, containerId);
+        if (!isShownFragment(fragment)) {
+            hideAllFragment(transaction, containerId);
+        }
         if (fragment.getState() == CYFragment.StoreState.HideOrShow) {
             if (fragment.isAdded()) {
-                transaction.show(fragment);
+                if (!isShownFragment(fragment)) {
+                    transaction.show(fragment);
+                    fragment.setUserVisibleHint(true);
+                }
             } else {
+                fragment.setParentContainerId(containerId);
                 transaction.add(containerId, fragment, tag);
+                fragment.setUserVisibleHint(true);
             }
         } else if (fragment.getState() == CYFragment.StoreState.REPLACE) {
+            fragment.setUserVisibleHint(false);
             transaction.replace(containerId, fragment, tag);
+            transaction.show(fragment);
+            fragment.setUserVisibleHint(true);
         }
+        this.shownFragment = fragment;
         transaction.commit();
+    }
+
+    private boolean isShownFragment(CYFragment fragment) {
+        return fragment == this.shownFragment;
     }
 
     protected void hideAllFragment(FragmentTransaction transaction, Integer containerId) {
@@ -154,6 +198,9 @@ public abstract class CYFragmentActivity extends FragmentActivity implements Vie
         }
         for (String tag : map.keySet()) {
             transaction.hide(map.get(tag));
+            if (this.shownFragment != null && this.shownFragment == map.get(tag)) {
+                this.shownFragment.setUserVisibleHint(false);
+            }
         }
     }
 
@@ -202,5 +249,20 @@ public abstract class CYFragmentActivity extends FragmentActivity implements Vie
         }
         outState.putBundle(TAG_NAME, bundle);
         super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        String tag = data.getStringExtra(CYFragment.RESULT_INTENT_TAG_KEY);
+        int containerId = data.getIntExtra(CYFragment.RESULT_INTENT_CONTAINER_KEY, -1);
+        if (tag != null && containerId != -1) {
+            data.removeExtra(CYFragment.RESULT_INTENT_TAG_KEY);
+            data.removeExtra(CYFragment.RESULT_INTENT_CONTAINER_KEY);
+            CYFragment fragment = getFragment(containerId, tag);
+            if (fragment != null) {
+                fragment.onActivityResult(requestCode, resultCode, data);
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }

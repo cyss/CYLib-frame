@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.cyss.android.lib.CYActivity;
+import com.cyss.android.lib.CYFragment;
 import com.cyss.android.lib.CYFragmentActivity;
 import com.cyss.android.lib.annotation.BindView;
 import com.cyss.android.lib.impl.CYViewParent;
@@ -102,8 +103,8 @@ public class ViewsManager {
         for (Field field : fields) {
             BindView bindView = null;
             try {
-                bindView = field.getAnnotation(BindView.class);
                 field.setAccessible(true);
+                bindView = field.getAnnotation(BindView.class);
                 field.set(obj, findViewById(obj, bindView.id()));
                 View v = (View) field.get(obj);
                 if (bindView.click()) {
@@ -117,11 +118,11 @@ public class ViewsManager {
                 }
             } catch (NullPointerException e) {
                 //can't find annotation
-                Log.e(LOG_TAG, "", e);
+                Log.e(LOG_TAG, "field name:" + field.getName(), e);
             } catch (IllegalAccessException e) {
-                Log.e(LOG_TAG, "", e);
+                Log.e(LOG_TAG, "field name:" + field.getName(), e);
             } catch (ClassCastException e) {
-                Log.e(LOG_TAG, "", e);
+                Log.e(LOG_TAG, "field name:" + field.getName(), e);
             }
         }
     }
@@ -221,6 +222,8 @@ public class ViewsManager {
             return ((View) obj).findViewById(id);
         } else if (obj instanceof Activity) {
             return ((Activity) obj).findViewById(id);
+        } else if (obj instanceof CYFragment) {
+            return ((CYFragment) obj).getMainView().findViewById(id);
         }
         return null;
     }

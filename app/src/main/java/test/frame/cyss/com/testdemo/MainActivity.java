@@ -25,8 +25,12 @@ public class MainActivity extends CYActivity {
 
     @BindView(id = R.id.btn, click = true)
     private Button btn;
+    @BindView(id = R.id.toFragment, click = true)
+    private Button toFragment;
     @BindView(id = R.id.hw)
     private TextView hw;
+    @BindView(id = R.id.showInjection, click = true)
+    private Button showInjection;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,8 +50,13 @@ public class MainActivity extends CYActivity {
 
     @Override
     public void viewClick(View v) {
-        startActivity(new Intent(this, ListViewActivity.class));
-//        hw.setText(getBeanData(Person.class).toString());
+        if (v.getId() == R.id.btn) {
+            startActivity(new Intent(this, ListViewActivity.class));
+        } else if (v.getId() == R.id.toFragment) {
+            startActivity(new Intent(this, FragmentActivity.class));
+        } else if (v.getId() == R.id.showInjection) {
+            hw.setText(getBeanData(Person.class).toString());
+        }
     }
 
 

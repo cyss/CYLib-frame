@@ -32,6 +32,18 @@
         android:layout_height="wrap_content"
         android:text="click" />
 
+    <Button
+        android:id="@+id/toFragment"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="To Fragment" />
+
+    <Button
+        android:id="@+id/showInjection"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Show Injection" />
+
     <test.frame.cyss.com.testdemo.CustomView
         android:id="@+id/comment"
         android:layout_width="fill_parent"

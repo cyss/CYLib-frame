@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.View;
 
 import com.cyss.android.lib.CYActivity;
+import com.cyss.android.lib.CYFragment;
 import com.cyss.android.lib.CYFragmentActivity;
 
 import java.lang.reflect.Field;
@@ -82,14 +83,18 @@ public class ActivityUtils {
     }
 
     public static Object getBeanData(Class clazz, CYActivity activity) {
-        return getBeanData(clazz, activity);
+        return getCommonBeanData(clazz, activity);
     }
 
     public static Object getBeanData(Class clazz, CYFragmentActivity activity) {
-        return getBeanData(clazz, activity);
+        return getCommonBeanData(clazz, activity);
     }
 
-    private static Object getBeanData(Class clazz, Object context) {
+    public static Object getBeanData(Class clazz, CYFragment fragment) {
+        return getCommonBeanData(clazz, fragment.getActivity());
+    }
+
+    private static Object getCommonBeanData(Class clazz, Object context) {
         Field[] fields = clazz.getDeclaredFields();
         Object obj = null;
         try {
