@@ -44,6 +44,12 @@
         android:layout_height="wrap_content"
         android:text="Show Injection" />
 
+    <Button
+        android:id="@+id/executeSync"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Execute Sync" />
+
     <test.frame.cyss.com.testdemo.CustomView
         android:id="@+id/comment"
         android:layout_width="fill_parent"

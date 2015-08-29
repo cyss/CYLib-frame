@@ -8,6 +8,7 @@ import android.widget.TextView;
 
 import com.cyss.android.lib.CYFragment;
 import com.cyss.android.lib.annotation.BindView;
+import com.cyss.android.lib.utils.CYLog;
 
 import test.frame.cyss.com.testdemo.R;
 
@@ -21,6 +22,13 @@ public class Tab1Fragment extends CYFragment {
     @BindView(id = R.id.tempBtn, click = true)
     private TextView tempBtn;
 
+    private String changeStr;
+
+    public Tab1Fragment(String changeStr, Integer appendInt) {
+        CYLog.d(this, "===>" + changeStr);
+        this.changeStr = changeStr + appendInt;
+    }
+
     @Override
     protected View inflaterView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_tab1, null);
@@ -28,6 +36,6 @@ public class Tab1Fragment extends CYFragment {
 
     @Override
     public void viewClick(View v) {
-        tempTv.setText("hehehehe");
+        tempTv.setText(this.changeStr);
     }
 }

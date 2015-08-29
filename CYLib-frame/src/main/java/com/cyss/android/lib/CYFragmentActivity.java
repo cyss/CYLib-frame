@@ -15,6 +15,7 @@ import com.cyss.android.lib.utils.ActivityUtils;
 import com.cyss.android.lib.utils.CYLog;
 import com.cyss.android.lib.utils.ViewsManager;
 
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -102,15 +103,58 @@ public abstract class CYFragmentActivity extends FragmentActivity implements Vie
         return ActivityUtils.getBeanData(clazz, this);
     }
 
-    public void addFragmentToContainer(CYFragment fragment, Integer containerId, String tag) {
+    private CYFragment createFragment(Class clazz, Object... constructorArgs) throws Exception {
+        CYFragment fragment = null;
+        Class[] argsType = new Class[constructorArgs.length];
+        int i = 0;
+        for (Object obj : constructorArgs) {
+            argsType[i++] = obj.getClass();
+        }
+        Constructor constructor = clazz.getConstructor(argsType);
+        if (constructor != null) {
+            fragment = (CYFragment) constructor.newInstance(constructorArgs);
+            CYLog.d(this, "===>constructor is not null");
+        } else {
+            CYLog.d(this, "===>constructor is null");
+        }
+        return fragment;
+    }
+
+    public CYFragment createFragment(Integer containerId, String tag, Class clazz, Object... constructorArgs) throws Exception {
+        CYFragment fragment = null;
         Map<String, CYFragment> map = fragments.get(containerId);
         if (map == null) {
             map = new HashMap<String, CYFragment>();
             fragments.put(containerId, map);
+            fragment = createFragment(clazz, constructorArgs);
+            map.put(tag, fragment);
+            this.addTags(containerId, tag);
+        } else {
+            if (map.containsKey(tag)) {
+                fragment = map.get(tag);
+            } else {
+                fragment = createFragment(clazz, constructorArgs);
+                map.put(tag, fragment);
+                this.addTags(containerId, tag);
+            }
         }
-        map.put(tag, fragment);
-        this.addTags(containerId, tag);
+        return fragment;
+    }
+
+    public CYFragment createFragment(Integer containerId, String tag, Class clazz) throws Exception {
+        return createFragment(containerId, tag, clazz, new Object[0]);
+    }
+
+    public CYFragment createFragmentToContainer(Integer containerId, String tag, Class clazz) throws Exception {
+        CYFragment fragment = createFragment(containerId, tag, clazz);
         showFragment(fragment, containerId, tag);
+        return fragment;
+    }
+
+    public CYFragment createFragmentToContainer(Integer containerId, String tag, Class clazz, Object... constructorArgs) throws Exception {
+        CYFragment fragment = createFragment(containerId, tag, clazz, constructorArgs);
+        showFragment(fragment, containerId, tag);
+        return fragment;
     }
 
     public Boolean showFragment(final Integer containerId, final String tag) {
@@ -175,7 +219,6 @@ public abstract class CYFragmentActivity extends FragmentActivity implements Vie
                 fragment.setUserVisibleHint(true);
             }
         } else if (fragment.getState() == CYFragment.StoreState.REPLACE) {
-            fragment.setUserVisibleHint(false);
             transaction.replace(containerId, fragment, tag);
             transaction.show(fragment);
             fragment.setUserVisibleHint(true);

@@ -28,7 +28,7 @@ public class CYFragment extends Fragment implements View.OnTouchListener, View.O
         HideOrShow
     }
 
-    private StoreState state = StoreState.REPLACE;
+    private StoreState state = StoreState.HideOrShow;
     private Map<Integer, View> needViews = new HashMap<Integer, View>();
     private View mainView;
     private int parentContainerId = -1;

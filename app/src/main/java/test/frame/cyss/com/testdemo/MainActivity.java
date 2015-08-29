@@ -13,6 +13,8 @@ import android.widget.Toast;
 
 import com.cyss.android.lib.CYActivity;
 import com.cyss.android.lib.annotation.BindView;
+import com.cyss.android.lib.service.CYSyncCallBack;
+import com.cyss.android.lib.service.CYSyncTask;
 import com.cyss.android.lib.utils.CYLog;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -20,6 +22,9 @@ import com.google.gson.GsonBuilder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import test.frame.cyss.com.testdemo.impl.RequestHttp;
+import test.frame.cyss.com.testdemo.impl.TimeSleep;
 
 public class MainActivity extends CYActivity {
 
@@ -31,6 +36,8 @@ public class MainActivity extends CYActivity {
     private TextView hw;
     @BindView(id = R.id.showInjection, click = true)
     private Button showInjection;
+    @BindView(id = R.id.executeSync, click = true)
+    private Button executeSync;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +63,45 @@ public class MainActivity extends CYActivity {
             startActivity(new Intent(this, FragmentActivity.class));
         } else if (v.getId() == R.id.showInjection) {
             hw.setText(getBeanData(Person.class).toString());
+        } else if (v.getId() == R.id.executeSync) {
+            CYSyncTask task = CYSyncTask.create(this).setBehaviour(RequestHttp.class).addArg("send_num", 12).setCallBack(new CYSyncCallBack() {
+                @Override
+                public void success(Bundle bundle) {
+                    appendLog(bundle.getString("test") + ":" + bundle.getInt("number"));
+                }
+
+                @Override
+                public void fail(Bundle bundle, Exception ex) {
+
+                }
+
+                @Override
+                public void cancel(int reason) {
+
+                }
+            }).execute();
+
+            CYSyncTask.create(this).setBehaviour(TimeSleep.class).addArg("send_num", 2).setCallBack(new CYSyncCallBack() {
+                @Override
+                public void success(Bundle bundle) {
+                    appendLog(bundle.getString("test") + ":" + bundle.getInt("number"));
+                }
+
+                @Override
+                public void fail(Bundle bundle, Exception ex) {
+
+                }
+
+                @Override
+                public void cancel(int reason) {
+
+                }
+            }).execute();
         }
+    }
+
+    private void appendLog(String txt) {
+        hw.setText(hw.getText() + "\n" + txt);
     }
 
 

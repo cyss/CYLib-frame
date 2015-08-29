@@ -159,8 +159,10 @@ public class CYListView extends ListView {
      * 停止加载更多
      */
     public void endLoadMore() {
-        setFooterContent(CYListViewState.CLICK_TO_LOAD_MORE);
-        bounceBackFooter();
+        if (footerEnable) {
+            setFooterContent(CYListViewState.CLICK_TO_LOAD_MORE);
+            bounceBackFooter();
+        }
     }
 
     /**
@@ -220,7 +222,7 @@ public class CYListView extends ListView {
         footerContainer.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (footerState == CYListViewState.CLICK_TO_LOAD_MORE) {
+                if (footerState == CYListViewState.CLICK_TO_LOAD_MORE && footerEnable) {
                     setFooterContent(CYListViewState.LOADING_MORE);
                 }
             }
@@ -391,7 +393,7 @@ public class CYListView extends ListView {
         } else if (state == CYListViewState.LOADING_MORE) {
             footerSpinner.setVisibility(View.VISIBLE);
             footerTitle.setText("正在加载数据");
-            if (this.loadMoreListener != null) {
+            if (this.loadMoreListener != null && footerEnable) {
                 this.loadMoreListener.onLoadMore();
             }
         } else if (state == CYListViewState.LOAD_FINISH) {

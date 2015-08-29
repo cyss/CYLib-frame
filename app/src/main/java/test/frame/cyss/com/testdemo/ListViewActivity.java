@@ -29,6 +29,8 @@ public class ListViewActivity extends CYActivity {
     private Button btn;
     private int count = 10;
 
+    private String preStr = "hehehehehshshshehsehshe";
+
     private boolean headerEnable = true;
     private ListViewAdapter adapter = new ListViewAdapter();
 
@@ -37,12 +39,24 @@ public class ListViewActivity extends CYActivity {
         public void handleMessage(Message msg) {
             if (msg.what == 0) {
                 listView.endRefresh();
+                adapter.notifyDataSetChanged();
             } else {
                 listView.endLoadMore();
                 adapter.notifyDataSetChanged();
             }
         }
     };
+
+    public static String getRandomString(int length) { //length表示生成字符串的长度
+        String base = "abcdefghijklmnopqrstuvwxyz0123456789";
+        Random random = new Random();
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < length; i++) {
+            int number = random.nextInt(base.length());
+            sb.append(base.charAt(number));
+        }
+        return sb.toString();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,10 +71,11 @@ public class ListViewActivity extends CYActivity {
                     @Override
                     public void run() {
                         try {
-                            Thread.sleep(2000);
+                            Thread.sleep(1000);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
+                        preStr = getRandomString(15);
                         handler.sendEmptyMessage(0);
                     }
                 }).start();
@@ -120,7 +135,7 @@ public class ListViewActivity extends CYActivity {
                 convertView = LayoutInflater.from(ListViewActivity.this).inflate(R.layout.listview_item, null);
             }
             TextView tv = (TextView) convertView.findViewById(R.id.joker);
-            tv.setText("hehehehehshshshehsehshe" + position);
+            tv.setText(preStr + position);
             return convertView;
         }
     }

@@ -41,17 +41,15 @@ public class FragmentActivity extends CYFragmentActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fragment);
-
-        CYFragment tab1 = getFragment(containerId, tab1Tag) == null ? new Tab1Fragment() : getFragment(containerId, tab1Tag);
-        CYFragment tab2 = getFragment(containerId, tab2Tag) == null ? new Tab2Fragment() : getFragment(containerId, tab2Tag);
-        CYFragment tab3 = getFragment(containerId, tab3Tag) == null ? new Tab3Fragment() : getFragment(containerId, tab3Tag);
-        CYFragment tab4 = getFragment(containerId, tab4Tag) == null ? new Tab4Fragment() : getFragment(containerId, tab4Tag);
-
-        addFragmentToContainer(tab1, containerId, tab1Tag);
-        addFragmentToContainer(tab2, containerId, tab2Tag);
-        addFragmentToContainer(tab3, containerId, tab3Tag);
-        addFragmentToContainer(tab4, containerId, tab4Tag);
-
+        try {
+            createFragmentToContainer(containerId, tab1Tag, Tab1Fragment.class, "Test constructor args for string", 1010);
+            createFragmentToContainer(containerId, tab2Tag, Tab2Fragment.class);
+            createFragmentToContainer(containerId, tab3Tag, Tab3Fragment.class);
+            createFragmentToContainer(containerId, tab4Tag, Tab4Fragment.class);
+        } catch (Exception e) {
+            //handle error
+            CYLog.d(this, "===>Create fragment error", e);
+        }
         showFragment(containerId, tab1Tag);
     }
 
