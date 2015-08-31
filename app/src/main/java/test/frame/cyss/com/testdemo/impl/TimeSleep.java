@@ -1,16 +1,15 @@
 package test.frame.cyss.com.testdemo.impl;
 
-import com.cyss.android.lib.service.CYSyncBehaviour;
-import com.cyss.android.lib.service.CYSyncResult;
-import com.cyss.android.lib.service.CYSyncTask;
+import com.cyss.android.lib.service.CYASyncBehaviour;
+import com.cyss.android.lib.service.CYASyncResult;
 
 /**
  * Created by cyjss on 2015/8/29.
  */
-public class TimeSleep extends CYSyncBehaviour {
+public class TimeSleep extends CYASyncBehaviour {
 
     @Override
-    public CYSyncResult run() {
+    public CYASyncResult run() {
         try {
             Thread.sleep(2000);
         } catch (InterruptedException e) {

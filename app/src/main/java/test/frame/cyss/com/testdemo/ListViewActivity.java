@@ -47,7 +47,7 @@ public class ListViewActivity extends CYActivity {
         }
     };
 
-    public static String getRandomString(int length) { //length表示生成字符串的长度
+    public static String getRandomString(int length) {
         String base = "abcdefghijklmnopqrstuvwxyz0123456789";
         Random random = new Random();
         StringBuffer sb = new StringBuffer();

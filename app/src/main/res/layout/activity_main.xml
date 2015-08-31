@@ -1,59 +1,46 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/hw"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/hello_world" />
-
-    <EditText
-        android:id="@+id/et"
+    <FrameLayout
+        android:id="@+id/contentContainer"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="fill_parent"
+        android:layout_above="@+id/tabsContainer"
+        android:layout_alignParentTop="true"></FrameLayout>
 
-
-    <EditText
-        android:id="@+id/name"
+    <RadioGroup
+        android:id="@+id/tabsContainer"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="54dp"
+        android:layout_alignParentBottom="true"
+        android:background="#5F99E2"
+        android:orientation="horizontal">
 
-    <EditText
-        android:id="@+id/age"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content" />
+        <RadioButton
+            android:id="@+id/tab1"
+            style="@style/tabBarItem"
+            android:tag="tab1"
+            android:text="@string/tab1Title" />
 
-    <Button
-        android:id="@+id/btn"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="click" />
+        <RadioButton
+            android:id="@+id/tab2"
+            style="@style/tabBarItem"
+            android:tag="tab2"
+            android:text="@string/tab2Title" />
 
-    <Button
-        android:id="@+id/toFragment"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="To Fragment" />
+        <RadioButton
+            android:id="@+id/tab3"
+            style="@style/tabBarItem"
+            android:tag="tab3"
+            android:text="@string/tab3Title" />
 
-    <Button
-        android:id="@+id/showInjection"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="Show Injection" />
-
-    <Button
-        android:id="@+id/executeSync"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="Execute Sync" />
-
-    <test.frame.cyss.com.testdemo.CustomView
-        android:id="@+id/comment"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"></test.frame.cyss.com.testdemo.CustomView>
-
-</LinearLayout>
+        <RadioButton
+            android:id="@+id/tab4"
+            style="@style/tabBarItem"
+            android:tag="tab4"
+            android:text="@string/tab4Title" />
+    </RadioGroup>
+</RelativeLayout>

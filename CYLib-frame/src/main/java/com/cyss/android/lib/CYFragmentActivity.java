@@ -207,24 +207,28 @@ public abstract class CYFragmentActivity extends FragmentActivity implements Vie
         if (!isShownFragment(fragment)) {
             hideAllFragment(transaction, containerId);
         }
+        boolean resumeFlag = false;
         if (fragment.getState() == CYFragment.StoreState.HideOrShow) {
             if (fragment.isAdded()) {
                 if (!isShownFragment(fragment)) {
                     transaction.show(fragment);
-                    fragment.setUserVisibleHint(true);
+                    resumeFlag = true;
+
                 }
             } else {
                 fragment.setParentContainerId(containerId);
                 transaction.add(containerId, fragment, tag);
-                fragment.setUserVisibleHint(true);
+                resumeFlag = true;
             }
         } else if (fragment.getState() == CYFragment.StoreState.REPLACE) {
             transaction.replace(containerId, fragment, tag);
             transaction.show(fragment);
-            fragment.setUserVisibleHint(true);
+            resumeFlag = true;
         }
         this.shownFragment = fragment;
         transaction.commit();
+
+        fragment.setUserVisibleHint(true);
     }
 
     private boolean isShownFragment(CYFragment fragment) {

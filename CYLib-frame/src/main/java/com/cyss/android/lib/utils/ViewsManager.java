@@ -8,11 +8,14 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.cyss.android.lib.CYActivity;
 import com.cyss.android.lib.CYFragment;
 import com.cyss.android.lib.CYFragmentActivity;
+import com.cyss.android.lib.R;
 import com.cyss.android.lib.annotation.BindView;
 import com.cyss.android.lib.impl.CYViewParent;
 
@@ -20,6 +23,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -150,6 +154,28 @@ public class ViewsManager {
                     } catch (NumberFormatException e) {
                     }
                 }
+            } else if (v instanceof RadioGroup && manager != null) {
+                String val = obj.toString();
+                RadioGroup rg = (RadioGroup) v;
+                boolean isChecked = false;
+                for (int i = 0; i < rg.getChildCount(); i++) {
+                    View _v = rg.getChildAt(i);
+                    if (_v instanceof RadioButton) {
+                        RadioButton rb = (RadioButton) _v;
+                        Object tag = rg.getTag();
+                        if (tag != null && tag.toString().equals(val)) {
+                            rb.setChecked(true);
+                            isChecked = true;
+                            break;
+                        }
+                    }
+                }
+                if (!isChecked) {
+                    View _v = rg.findViewById(manager.findIdByName(val));
+                    if (_v != null) {
+                        ((RadioButton) _v).setChecked(true);
+                    }
+                }
             }
         }
     }
@@ -157,14 +183,19 @@ public class ViewsManager {
     public static Object getViewData(View v) {
         Object obj = null;
         if (v != null) {
-            if (v instanceof TextView) {
+            if (v instanceof CYViewParent) {
+                obj = ((CYViewParent) v).getCustomData();
+            } else if (v instanceof TextView) {
                 obj = ((TextView) v).getText();
             } else if (v instanceof Button) {
                 obj = ((Button) v).getTag();
             } else if (v instanceof EditText) {
                 obj = ((EditText) v).getText();
-            } else if (v instanceof CYViewParent) {
-                obj = ((CYViewParent) v).getCustomData();
+            } else if (v instanceof RadioGroup && manager != null) {
+                RadioGroup rg = (RadioGroup) v;
+                int checkId = rg.getCheckedRadioButtonId();
+                RadioButton btn = (RadioButton) rg.findViewById(checkId);
+                obj = btn.getTag() == null ? manager.findNameById(checkId) : btn.getTag();
             }
         }
         return obj;
@@ -186,6 +217,10 @@ public class ViewsManager {
                 method.invoke(obj, Float.parseFloat(val.toString()));
             } else if (c.equals(Double.class)) {
                 method.invoke(obj, Double.parseDouble(val.toString()));
+            } else if (c.equals(Date.class)) {
+                if (val instanceof Date) {
+                    method.invoke(obj, (Date) val);
+                }
             } else {
                 method.invoke(obj, val);
             }

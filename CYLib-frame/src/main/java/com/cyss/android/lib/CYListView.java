@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Build;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -158,11 +159,20 @@ public class CYListView extends ListView {
     /**
      * 停止加载更多
      */
-    public void endLoadMore() {
+    public void endLoadMore(long successTime) {
         if (footerEnable) {
-            setFooterContent(CYListViewState.CLICK_TO_LOAD_MORE);
-            bounceBackFooter();
+            postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    setFooterContent(CYListViewState.CLICK_TO_LOAD_MORE);
+                    bounceBackFooter();
+                }
+            }, successTime);
         }
+    }
+
+    public void endLoadMore() {
+        this.endLoadMore(280);
     }
 
     /**
@@ -394,6 +404,7 @@ public class CYListView extends ListView {
             footerSpinner.setVisibility(View.VISIBLE);
             footerTitle.setText("正在加载数据");
             if (this.loadMoreListener != null && footerEnable) {
+                footerState = state;
                 this.loadMoreListener.onLoadMore();
             }
         } else if (state == CYListViewState.LOAD_FINISH) {

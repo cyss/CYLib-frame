@@ -14,11 +14,9 @@ import test.frame.cyss.com.testdemo.R;
  */
 public class Tab4Fragment extends CYFragment {
 
-
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return LayoutInflater.from(getActivity()).inflate(R.layout.fragment_tab4, null);
+    protected View inflaterView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        return null;
     }
-
 
 }

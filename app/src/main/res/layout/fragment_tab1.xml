@@ -5,15 +5,53 @@
     android:orientation="vertical">
 
     <TextView
-        android:id="@+id/tempTv"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="tab1" />
+        android:text="添加一个人员信息(Person)" />
+
+    <EditText
+        android:id="@+id/name"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:hint="姓名" />
+
+    <RadioGroup
+        android:id="@+id/gender"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/male"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:tag="male"
+            android:text="男" />
+
+        <RadioButton
+            android:id="@+id/female"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:tag="female"
+            android:text="女" />
+    </RadioGroup>
+
+    <EditText
+        android:id="@+id/age"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:hint="年龄"
+        android:inputType="number" />
 
     <Button
-        android:id="@+id/tempBtn"
+        android:id="@+id/saveBtn"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="click" />
+        android:text="添加" />
+
+    <TextView
+        android:id="@+id/tempTv"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" />
 </LinearLayout>

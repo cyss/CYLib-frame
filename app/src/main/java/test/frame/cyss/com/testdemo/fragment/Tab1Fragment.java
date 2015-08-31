@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.cyss.android.lib.CYFragment;
@@ -11,6 +12,7 @@ import com.cyss.android.lib.annotation.BindView;
 import com.cyss.android.lib.utils.CYLog;
 
 import test.frame.cyss.com.testdemo.R;
+import test.frame.cyss.com.testdemo.pojo.Person;
 
 /**
  * Created by cyjss on 2015/8/21.
@@ -19,15 +21,8 @@ public class Tab1Fragment extends CYFragment {
 
     @BindView(id = R.id.tempTv)
     private TextView tempTv;
-    @BindView(id = R.id.tempBtn, click = true)
-    private TextView tempBtn;
-
-    private String changeStr;
-
-    public Tab1Fragment(String changeStr, Integer appendInt) {
-        CYLog.d(this, "===>" + changeStr);
-        this.changeStr = changeStr + appendInt;
-    }
+    @BindView(id = R.id.saveBtn, click = true)
+    private Button saveBtn;
 
     @Override
     protected View inflaterView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -36,6 +31,11 @@ public class Tab1Fragment extends CYFragment {
 
     @Override
     public void viewClick(View v) {
-        tempTv.setText(this.changeStr);
+        if (v.getId() == R.id.saveBtn) {
+            Person person = (Person) getBeanData(Person.class);
+            tempTv.setText(person.toString());
+            Tab2Fragment tab2 = (Tab2Fragment) getCYFragmentActivity().getFragment(R.id.contentContainer, "tab2");
+            tab2.personList.add(person);
+        }
     }
 }

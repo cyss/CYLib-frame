@@ -44,7 +44,7 @@
         </activity>
         <activity android:name=".ListViewActivity"></activity>
         <activity android:name=".FragmentActivity"></activity>
-        <service android:name="com.cyss.android.lib.service.CYSyncService" />
+        <service android:name="com.cyss.android.lib.service.CYASyncService" />
     </application>
 
 </manifest>

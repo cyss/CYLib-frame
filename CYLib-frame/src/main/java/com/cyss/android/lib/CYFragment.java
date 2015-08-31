@@ -21,7 +21,7 @@ import java.util.Map;
 /**
  * Created by cyjss on 2015/8/11.
  */
-public class CYFragment extends Fragment implements View.OnTouchListener, View.OnClickListener, View.OnLongClickListener, CYAutoData {
+public abstract class CYFragment extends Fragment implements View.OnClickListener, View.OnLongClickListener, CYAutoData {
 
     public static enum StoreState {
         REPLACE,
@@ -39,14 +39,22 @@ public class CYFragment extends Fragment implements View.OnTouchListener, View.O
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = this.inflaterView(inflater, container, savedInstanceState);
-        this.mainView = v;
-        v.setOnTouchListener(this);
-        ViewsManager.injectVariable(this, needViews);
+        if (v != null) {
+            this.mainView = v;
+//            v.setOnTouchListener(this);
+            ViewsManager.injectVariable(this, needViews);
+        }
+        viewLoaded(v);
         return v;
     }
 
-    protected View inflaterView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return null;
+    protected abstract View inflaterView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState);
+
+    protected void viewLoaded(View v) {
+    }
+
+    public CYFragmentActivity getCYFragmentActivity() {
+        return (CYFragmentActivity) super.getActivity();
     }
 
     @Override
@@ -134,10 +142,10 @@ public class CYFragment extends Fragment implements View.OnTouchListener, View.O
         }
     }
 
-    @Override
-    public boolean onTouch(View v, MotionEvent event) {
-        return true;
-    }
+//    @Override
+//    public boolean onTouch(View v, MotionEvent event) {
+//        return true;
+//    }
 
     @Override
     public void onClick(View v) {
