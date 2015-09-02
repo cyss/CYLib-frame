@@ -14,6 +14,7 @@ import android.widget.Toast;
 import com.cyss.android.lib.CYActivity;
 import com.cyss.android.lib.CYFragment;
 import com.cyss.android.lib.CYFragmentActivity;
+import com.cyss.android.lib.CYSlidingMenu;
 import com.cyss.android.lib.annotation.BindView;
 import com.cyss.android.lib.service.CYASyncCallBack;
 import com.cyss.android.lib.service.CYASyncTask;
@@ -35,6 +36,8 @@ public class MainActivity extends CYFragmentActivity implements RadioGroup.OnChe
     private final int contentContainer = R.id.contentContainer;
     @BindView(id = R.id.tabsContainer)
     private RadioGroup tabsContainer;
+    private CYSlidingMenu slidingMenu;
+
 
     private static final String TAB1_TAG = "tab1";
     private static final String TAB2_TAG = "tab2";
@@ -53,7 +56,11 @@ public class MainActivity extends CYFragmentActivity implements RadioGroup.OnChe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        slidingMenu = new CYSlidingMenu(this);
+        slidingMenu.setContentView(R.layout.activity_main);
+        slidingMenu.setLeftMenuView(R.layout.layout_sliding_menu);
+        setContentView(slidingMenu);
+//        setContentView(R.layout.activity_main);
         tabsContainer.setOnCheckedChangeListener(this);
         for (String key : fragments.keySet()) {
             try {
@@ -63,6 +70,10 @@ public class MainActivity extends CYFragmentActivity implements RadioGroup.OnChe
             }
         }
         showFragment(contentContainer, TAB1_TAG);
+    }
+
+    public void showLeftMenu() {
+        slidingMenu.openLeftMenu();
     }
 
     @Override

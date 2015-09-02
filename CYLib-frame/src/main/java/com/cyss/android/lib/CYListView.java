@@ -296,6 +296,9 @@ public class CYListView extends ListView {
 
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
+        if (getAdapter() == null) {
+            return false;
+        }
         switch (ev.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 downY = ev.getY();

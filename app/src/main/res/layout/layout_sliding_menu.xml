@@ -2,12 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#00ff00"
     android:orientation="vertical">
 
-    <include layout="@layout/actionbar_default" />
-
-    <com.cyss.android.lib.CYListView
-        android:id="@+id/listView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
 </LinearLayout>

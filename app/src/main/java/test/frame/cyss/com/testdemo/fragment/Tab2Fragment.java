@@ -39,7 +39,9 @@ public class Tab2Fragment extends CYFragment implements CYListView.onCYListViewR
         this.listView.setOnCYListRefreshListener(this);
         this.adapter = new ListViewAdapter();
         this.listView.setAdapter(this.adapter);
-        personList.add(new Person());
+        for (int i = 0; i < 100; i++) {
+            personList.add(new Person());
+        }
     }
 
     @Override
@@ -54,7 +56,7 @@ public class Tab2Fragment extends CYFragment implements CYListView.onCYListViewR
 
     @Override
     public void onLoadMore() {
-        listView.endLoadMore();
+        listView.endLoadMore(2000);
     }
 
     private class ListViewAdapter extends BaseAdapter {

@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.cyss.android.lib.CYFragment;
+import com.cyss.android.lib.CYSlidingMenu;
 
 import test.frame.cyss.com.testdemo.R;
 
@@ -14,9 +15,14 @@ import test.frame.cyss.com.testdemo.R;
  */
 public class Tab4Fragment extends CYFragment {
 
+    private CYSlidingMenu slidingMenu;
+
     @Override
     protected View inflaterView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return null;
+        slidingMenu = new CYSlidingMenu(getActivity());
+        slidingMenu.setContentView(R.layout.activity_listview);
+        slidingMenu.setLeftMenuView(R.layout.listview_item);
+        return slidingMenu;
     }
 
 }

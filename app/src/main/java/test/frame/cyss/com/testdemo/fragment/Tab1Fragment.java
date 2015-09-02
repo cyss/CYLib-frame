@@ -11,6 +11,7 @@ import com.cyss.android.lib.CYFragment;
 import com.cyss.android.lib.annotation.BindView;
 import com.cyss.android.lib.utils.CYLog;
 
+import test.frame.cyss.com.testdemo.MainActivity;
 import test.frame.cyss.com.testdemo.R;
 import test.frame.cyss.com.testdemo.pojo.Person;
 
@@ -23,10 +24,25 @@ public class Tab1Fragment extends CYFragment {
     private TextView tempTv;
     @BindView(id = R.id.saveBtn, click = true)
     private Button saveBtn;
+    @BindView(id = R.id.titleBar)
+    private TextView titleBar;
+    @BindView(id = R.id.leftBtn, click = true)
+    private Button leftBtn;
 
     @Override
     protected View inflaterView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_tab1, null);
+    }
+
+    @Override
+    protected void viewLoaded(View v) {
+        leftBtn.setVisibility(View.VISIBLE);
+        leftBtn.setText("Menu");
+    }
+
+    @Override
+    protected void viewOnResume() {
+        this.titleBar.setText(R.string.tab1Title);
     }
 
     @Override
@@ -36,6 +52,9 @@ public class Tab1Fragment extends CYFragment {
             tempTv.setText(person.toString());
             Tab2Fragment tab2 = (Tab2Fragment) getCYFragmentActivity().getFragment(R.id.contentContainer, "tab2");
             tab2.personList.add(person);
+        } else if (v.getId() == R.id.leftBtn) {
+            MainActivity mainActivity = (MainActivity) getCYFragmentActivity();
+            mainActivity.showLeftMenu();
         }
     }
 }

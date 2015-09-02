@@ -3,20 +3,19 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
-
     <FrameLayout
         android:id="@+id/contentContainer"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:layout_above="@+id/tabsContainer"
-        android:layout_alignParentTop="true"></FrameLayout>
+        android:layout_below="@+id/actionBar"></FrameLayout>
 
     <RadioGroup
         android:id="@+id/tabsContainer"
         android:layout_width="fill_parent"
         android:layout_height="54dp"
         android:layout_alignParentBottom="true"
-        android:background="#5F99E2"
+        android:background="@color/defaultBlue"
         android:orientation="horizontal">
 
         <RadioButton

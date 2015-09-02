@@ -109,6 +109,9 @@ public class ViewsManager {
             try {
                 field.setAccessible(true);
                 bindView = field.getAnnotation(BindView.class);
+                if (bindView == null) {
+                    continue;
+                }
                 field.set(obj, findViewById(obj, bindView.id()));
                 View v = (View) field.get(obj);
                 if (bindView.click()) {
