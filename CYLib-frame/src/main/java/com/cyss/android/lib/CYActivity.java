@@ -55,6 +55,10 @@ public abstract class CYActivity extends Activity implements View.OnClickListene
         ViewsManager.injectVariable(this, needViews);
     }
 
+    /**
+     * 注册@BindView的点击事件到这里
+     * @param v
+     */
     public void viewClick(View v) {
     }
 
@@ -84,10 +88,18 @@ public abstract class CYActivity extends Activity implements View.OnClickListene
         return v;
     }
 
+    /**
+     * 填充Map数据
+     * @param params
+     */
     public void fillMapData(Map<String, Object> params) {
         ActivityUtils.fillMapData(params, this);
     }
 
+    /**
+     * 填出数据
+     * @param obj
+     */
     public void fillBeanData(Object obj) {
         ActivityUtils.fillBeanData(obj, this);
     }
@@ -101,15 +113,28 @@ public abstract class CYActivity extends Activity implements View.OnClickListene
         return getMapData(getWindow().getDecorView());
     }
 
+    /**
+     * 根据parentView获取参数
+     * @param parentView 获取数据的View容器
+     * @return
+     */
     public Map<String, Object> getMapData(View parentView) {
         return ActivityUtils.getMapData(parentView, this);
     }
 
+    /**
+     * 获取@BindView注解变量的值
+     * @return
+     */
     public Map<String, Object> getMapFieldData() {
         return ActivityUtils.getMapFieldData(needViews, this);
     }
 
-
+    /**
+     * 根据clazz获取数据
+     * @param clazz
+     * @return
+     */
     public Object getBeanData(Class clazz) {
         return ActivityUtils.getBeanData(clazz, this);
     }
