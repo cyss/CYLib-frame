@@ -5,9 +5,9 @@ android小工具,整理一下用到的东西,和一些小功能。
 * 1.数据注入和获取
 * 2.异步操作(例如http异步请求数据等)
 * 3.一些Widget
-	*CYFragment(做了一些简单封装)
-	*CYListView(上拉刷新和下拽加载)
-	*CYSlidingMenu(侧滑菜单)
+	* CYFragment(做了一些简单封装)
+	* CYListView(上拉刷新和下拽加载)
+	* CYSlidingMenu(侧滑菜单)
 
 ##1. 数据注入和获取
 **说明**
@@ -109,11 +109,11 @@ public class MainActivity extends CYActivity {
 当然填充数据和获取也支持Map
 
 ##2. 异步操作
-*1.添加service到AndroidManifest.xml
+* 1.添加service到AndroidManifest.xml
 ```xml
 <service android:name="com.cyss.android.lib.service.CYASyncService" />
 ```
-*2.创建一个异步行为
+* 2.创建一个异步行为
 ```java
 public class TimeSleep extends CYASyncBehaviour {
 
@@ -131,7 +131,7 @@ public class TimeSleep extends CYASyncBehaviour {
     }
 }
 ```
-*3.执行异步操作
+* 3.执行异步操作
 ```java
 CYASyncTask.create(getContext()).addArg("input", "hello!").setCallBack(new CYASyncCallBack() {
 	@Override
