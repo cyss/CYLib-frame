@@ -25,6 +25,8 @@ public class Tab2Fragment extends CYFragment implements CYListView.onCYListViewR
     @BindView(id = R.id.listView)
     private CYListView listView;
     private ListViewAdapter adapter;
+    @BindView(id = R.id.titleBar)
+    private TextView titleBar;
 
     public static List<Person> personList = new ArrayList<>();
 
@@ -36,10 +38,15 @@ public class Tab2Fragment extends CYFragment implements CYListView.onCYListViewR
     @Override
     protected void viewLoaded(View v) {
         this.listView.setOnCYListLoadMoreListener(this);
-        this.listView.setOnCYListRefreshListener(this);
+        this.listView.setOnCYListRefreshListener(new CYListView.onCYListViewRefreshListener() {
+            @Override
+            public void onRefresh() {
+
+            }
+        });
         this.adapter = new ListViewAdapter();
         this.listView.setAdapter(this.adapter);
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 10; i++) {
             personList.add(new Person());
         }
     }
@@ -47,6 +54,7 @@ public class Tab2Fragment extends CYFragment implements CYListView.onCYListViewR
     @Override
     protected void viewOnResume() {
         this.adapter.notifyDataSetChanged();
+        this.titleBar.setText(R.string.tab2Title);
     }
 
     @Override
@@ -56,7 +64,7 @@ public class Tab2Fragment extends CYFragment implements CYListView.onCYListViewR
 
     @Override
     public void onLoadMore() {
-        listView.endLoadMore(2000);
+        listView.endLoadMore();
     }
 
     private class ListViewAdapter extends BaseAdapter {

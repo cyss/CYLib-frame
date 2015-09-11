@@ -2,7 +2,127 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#00ff00"
-    android:orientation="vertical">
+    android:background="@drawable/left_menu_bg"
+    android:orientation="vertical"
+    android:paddingLeft="20dp"
+    android:paddingRight="40dp">
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp">
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="用户名"
+
+            android:textSize="12pt" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1px"
+        android:layout_marginBottom="12dp"
+        android:layout_marginTop="12dp"
+        android:background="#888888" />
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="设置"
+
+        android:textSize="9pt" />
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1px"
+        android:layout_marginBottom="12dp"
+        android:layout_marginTop="12dp"
+        android:background="#888888" />
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="设置"
+
+        android:textSize="9pt" />
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1px"
+        android:layout_marginBottom="12dp"
+        android:layout_marginTop="12dp"
+        android:background="#888888" />
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="设置"
+
+        android:textSize="9pt" />
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1px"
+        android:layout_marginBottom="12dp"
+        android:layout_marginTop="12dp"
+        android:background="#888888" />
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="设置"
+
+        android:textSize="9pt" />
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1px"
+        android:layout_marginBottom="12dp"
+        android:layout_marginTop="12dp"
+        android:background="#888888" />
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="设置"
+
+        android:textSize="9pt" />
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1px"
+        android:layout_marginBottom="12dp"
+        android:layout_marginTop="12dp"
+        android:background="#888888" />
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="设置"
+
+        android:textSize="9pt" />
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1px"
+        android:layout_marginBottom="12dp"
+        android:layout_marginTop="12dp"
+        android:background="#888888" />
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="设置"
+
+        android:textSize="9pt" />
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1px"
+        android:layout_marginBottom="12dp"
+        android:layout_marginTop="12dp"
+        android:background="#888888" />
 
 </LinearLayout>

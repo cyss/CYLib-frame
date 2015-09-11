@@ -13,8 +13,6 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.Scroller;
 
 import com.cyss.android.lib.utils.CYLog;
 import com.cyss.android.lib.utils.ScreenUtils;
@@ -28,7 +26,7 @@ public class CYSlidingMenu extends HorizontalScrollView {
     private View leftMenuView;
     private LinearLayout container;
     private FrameLayout leftMenuContainer;
-    private FrameLayout contentContainer;
+    private LinearLayout contentContainer;
 
     private int mTouchSlop;
 
@@ -72,26 +70,16 @@ public class CYSlidingMenu extends HorizontalScrollView {
         this.setOverScrollMode(OVER_SCROLL_ALWAYS);
         this.setHorizontalScrollBarEnabled(false);
 
-
-        LinearLayout.LayoutParams lp = null;
-
-        this.contentContainer = new FrameLayout(getContext());
+        this.contentContainer = new LinearLayout(getContext());
         this.container.addView(this.contentContainer);
-        lp = (LinearLayout.LayoutParams) this.contentContainer.getLayoutParams();
-        lp.width = ScreenUtils.getScreenSize(getContext())[0];
-        lp.height = LinearLayout.LayoutParams.MATCH_PARENT;
 
         this.leftMenuContainer = new FrameLayout(getContext());
         this.container.addView(this.leftMenuContainer, 0);
-        lp = (LinearLayout.LayoutParams) this.leftMenuContainer.getLayoutParams();
-        lp.width = ScreenUtils.getScreenSize(getContext())[0] - paddingLeft;
-        lp.height = LinearLayout.LayoutParams.MATCH_PARENT;
-        this.leftMenuWidth = lp.width;
     }
 
     private void addContentView() {
         this.contentContainer.addView(this.contentView);
-        FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) this.contentView.getLayoutParams();
+        LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) this.contentView.getLayoutParams();
         lp.width = LayoutParams.MATCH_PARENT;
         lp.height = LayoutParams.MATCH_PARENT;
         this.contentView.setLayoutParams(lp);
@@ -123,7 +111,6 @@ public class CYSlidingMenu extends HorizontalScrollView {
             float dy = y - this.downY;
             float dx = x - this.downX;
             boolean canScrollVertically = canScrollVertically(this.contentContainer, (int) dy, (int) x, (int) y);
-            CYLog.d(this, "===>" + (Math.abs(dy) >= mTouchSlop) + "," + canScrollVertically);
             if (Math.abs(dy) >= mTouchSlop && canScrollVertically) {
                 requestDisallowInterceptTouchEvent(true);
                 return false;
@@ -225,6 +212,22 @@ public class CYSlidingMenu extends HorizontalScrollView {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+
+        int w = MeasureSpec.getSize(widthMeasureSpec);
+        int wMode = MeasureSpec.getMode(widthMeasureSpec);
+        if (wMode == MeasureSpec.UNSPECIFIED) {
+            w = ScreenUtils.getScreenSize(getContext())[0];
+        }
+        LinearLayout.LayoutParams lp = null;
+
+        lp = (LinearLayout.LayoutParams) this.contentContainer.getLayoutParams();
+        lp.width = w;
+        lp.height = LinearLayout.LayoutParams.MATCH_PARENT;
+
+        lp = (LinearLayout.LayoutParams) this.leftMenuContainer.getLayoutParams();
+        lp.width = w - paddingLeft;
+        lp.height = LinearLayout.LayoutParams.MATCH_PARENT;
+        this.leftMenuWidth = lp.width;
     }
 
     @Override

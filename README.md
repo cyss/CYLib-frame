@@ -1,10 +1,18 @@
 #CYLib-frame
 android小工具,整理一下用到的东西,和一些小功能。
 
-**1. 目前添加一个数据填充功能**
+##目录
+*1.数据注入和获取
+*2.异步操作(例如http异步请求数据等)
+*3.一些Widget
+	*CYFragment(做了一些简单封装)
+	*CYListView(上拉刷新和下拽加载)
+	*CYSlidingMenu(侧滑菜单)
+
+##1. 数据注入和获取
 **说明**
 假如有这么个布局文件
-```
+```xml
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -36,7 +44,7 @@ android小工具,整理一下用到的东西,和一些小功能。
 
 ```
 来一个javabean吧
-```
+```java
 //内部类需要加上public static(getBeanData使用提示)
 public static class Person {
     private String name = "cyss";
@@ -75,7 +83,7 @@ public static class Person {
 ```
 
 其对应的Activity继承CYActivity
-```
+```java
 public class MainActivity extends CYActivity {
 
     //获取View和绑定click这里已经很常见了
@@ -99,4 +107,86 @@ public class MainActivity extends CYActivity {
 }
 ```
 当然填充数据和获取也支持Map
-![图片说明](http://git.oschina.net/uploads/images/2015/0806/174143_8c0f228c_97550.png "图片有点大..")
+
+##2. 异步操作
+*1.添加service到AndroidManifest.xml
+```xml
+<service android:name="com.cyss.android.lib.service.CYASyncService" />
+```
+*2.创建一个异步行为
+```java
+public class TimeSleep extends CYASyncBehaviour {
+
+    @Override
+    public CYASyncResult run() {
+	//处理一些异步行为
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        int num = getArgs().getInt("send_num", 0);
+	//return fail().addArg(...)为失败处理
+        return success().addArg("test", "TimeSleep--" + getArgs().getString("input")).addArg("number", num);
+    }
+}
+```
+*3.执行异步操作
+```java
+CYASyncTask.create(getContext()).addArg("input", "hello!").setCallBack(new CYASyncCallBack() {
+	@Override
+        public void success(Bundle bundle) {
+            Toast.makeText(getContext(), bundle.getString("test") + "," + bundle.getString("number"), Toast.LENGTH_LONG).show();
+        }
+
+        @Override
+        public void fail(Bundle bundle, Exception ex) {
+            //do fail
+        }
+
+	@Override
+        public void cancel(int reason) {
+	    //do cancel
+        }
+}).execute();
+```
+	execute()为立即执行，addQueue()为执行完上一个任务再执行
+	关于Http的操作，可使用HttpUtils中（未测试）
+
+##3.一些Widget
+###CYFragment和CYFragmentActivity配合使用
+	详见Demo/MainActivity
+	对于CYFragment大概封装有
+*1.重写viewOnResume() viewOnPause()相当于activity的 onResume() onPause()
+*2.对onActivityResult(int requestCode, int resultCode, Intent data)的支持
+*3.简化Fragment切换操作
+```java
+createFragmentToContainer(containerId, tab2Tag, Tab2Fragment.class);//添加Fragment
+showFragment(containerId, tab2Tag);//显示
+```
+
+###CYListView
+*详见Demo/fragment/Tab2Fragment
+```java
+listView.setOnCYListLoadMoreListener(new CYListView.onCYListViewLoadMoreListener() {
+     @Override
+     public void onLoadMore() { listView.endLoadMore(); }
+});
+listView.setOnCYListRefreshListener(new CYListView.onCYListViewRefreshListener() {
+     @Override
+      public void onRefresh() { listView.endRefresh(); }
+});
+listView.setFooterEnable(false);
+listView.setHeaderEnable(false);
+```
+
+###CYSlidingMenu
+详见Demo/MainActivity
+```java
+//滑动响应区域为contentView的左侧
+super.onCreate(savedInstanceState);
+slidingMenu = new CYSlidingMenu(this);
+slidingMenu.setContentView(R.layout.activity_main);
+slidingMenu.setLeftMenuView(R.layout.layout_sliding_menu);
+setContentView(slidingMenu);
+```

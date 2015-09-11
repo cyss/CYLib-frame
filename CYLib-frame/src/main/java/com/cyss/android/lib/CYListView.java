@@ -7,6 +7,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Build;
+import android.os.Bundle;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -24,7 +25,10 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Scroller;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.cyss.android.lib.service.CYASyncCallBack;
+import com.cyss.android.lib.service.CYASyncTask;
 import com.cyss.android.lib.utils.CYLog;
 
 import java.util.zip.Inflater;
@@ -108,6 +112,22 @@ public class CYListView extends ListView {
     public CYListView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         this.init(context);
+        CYASyncTask.create(getContext()).addArg("input", "hello!").setCallBack(new CYASyncCallBack() {
+            @Override
+            public void success(Bundle bundle) {
+                Toast.makeText(getContext(), bundle.getString("test") + "," + bundle.getString("number"), Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void fail(Bundle bundle, Exception ex) {
+                //do fail
+            }
+
+            @Override
+            public void cancel(int reason) {
+
+            }
+        });
     }
 
     /**

@@ -16,7 +16,6 @@ public class TimeSleep extends CYASyncBehaviour {
             e.printStackTrace();
         }
         int num = getArgs().getInt("send_num", 0);
-        return success().addArg("test", "TimeSleep").addArg("number", num);
+        return success().addArg("test", "TimeSleep--" + getArgs().getString("input")).addArg("number", num);
     }
-
 }
