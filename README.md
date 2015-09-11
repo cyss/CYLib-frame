@@ -2,9 +2,9 @@
 android小工具,整理一下用到的东西,和一些小功能。
 
 ##目录
-*1.数据注入和获取
-*2.异步操作(例如http异步请求数据等)
-*3.一些Widget
+* 1.数据注入和获取
+* 2.异步操作(例如http异步请求数据等)
+* 3.一些Widget
 	*CYFragment(做了一些简单封装)
 	*CYListView(上拉刷新和下拽加载)
 	*CYSlidingMenu(侧滑菜单)
@@ -150,16 +150,17 @@ CYASyncTask.create(getContext()).addArg("input", "hello!").setCallBack(new CYASy
         }
 }).execute();
 ```
-	execute()为立即执行，addQueue()为执行完上一个任务再执行
+
+execute()为立即执行，addQueue()为执行完上一个任务再执行
 	关于Http的操作，可使用HttpUtils中（未测试）
 
 ##3.一些Widget
 ###CYFragment和CYFragmentActivity配合使用
 	详见Demo/MainActivity
 	对于CYFragment大概封装有
-*1.重写viewOnResume() viewOnPause()相当于activity的 onResume() onPause()
-*2.对onActivityResult(int requestCode, int resultCode, Intent data)的支持
-*3.简化Fragment切换操作
+* 1.重写viewOnResume() viewOnPause()相当于activity的 onResume() onPause()
+* 2.对onActivityResult(int requestCode, int resultCode, Intent data)的支持
+* 3.简化Fragment切换操作
 ```java
 createFragmentToContainer(containerId, tab2Tag, Tab2Fragment.class);//添加Fragment
 showFragment(containerId, tab2Tag);//显示
